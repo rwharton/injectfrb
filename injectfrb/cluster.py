@@ -65,7 +65,8 @@ def read_singlepulse(fn, max_rows=None, beam=None):
             A = A[None]
         
         # SNR sample_no time log_2_width DM_trial DM Members first_samp last_samp
-        dm, sig, tt, downsample = A[:,5], A[:,0], A[:, -5], A[:, -4]
+        #dm, sig, tt, downsample = A[:,5], A[:,0], A[:, -5], A[:, -4]
+        dm, sig, tt, downsample = A[:,6], A[:,0], A[:, -5], A[:, -4]
 
         try:
             beamno = A[:, 9]
@@ -412,7 +413,7 @@ def plotfour(dataft, datats, datadmt, header,
     if showplot:
         fig.show()
 
-    return not_real
+    return 
 
 
 #    parent_axes=fig.add_subplot(324)
@@ -556,7 +557,7 @@ def make_candplots(fnfil, fncand, ndm=32):
 def plot_cluster(fn, cluster_index, figname_out):
     dm, sig, tt, downsample = read_singlepulse(fn, max_rows=None, beam=None)
     fig = plt.figure(figsize=(12,6))
-    plt.scatter(tt, dm, color=downsample, alpha=0.25, s=sig, cmap='RdBu')
+    plt.scatter(tt, dm, c=downsample, alpha=0.25, s=sig, cmap='RdBu')
     plt.scatter(tt[cluster_index], dm[cluster_index], color='k', s=5)
     plt.savefig(figname_out)
 
@@ -566,21 +567,8 @@ if __name__=='__main__':
     fnfil = sys.argv[3]
     giants_raw = np.genfromtxt(fn)
     sig_cut, dm_cut, tt_cut, ds_cut, cluster_index = get_triggers(fn, t_window=2.0)
-    plot_cluster(fn, cluster_index, figname_out
+    plot_cluster(fn, cluster_index, 'cluster.png')
     fmt = '%0.5f','%d','%d','%0.3f','%d','%d','%0.2f','%d'
     np.savetxt(fnout, giants_raw[cluster_index], fmt=fmt)
-    make_candplots(fnfil, fnout, 'candidates.pdf')
-
-
-
-
-
-
-
-
-
-
-
-
-
+    make_candplots(fnfil, fnout)
 
