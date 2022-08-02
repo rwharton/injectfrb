@@ -205,7 +205,7 @@ def inject_in_filterbank(fn_fil, fn_out_dir, N_FRB=1,
                                                                      start=0, stop=1)
             data = np.empty([NFREQ, NTIME])
         else:
-            fluence = 1000.
+            #fluence = 1000.
             # drop FRB in random location in data chunk
             #offset = random.randint(np.int(0.1*chunksize), np.int((1-f_edge)*chunksize))
             offset = 0

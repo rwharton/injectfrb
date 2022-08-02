@@ -227,8 +227,10 @@ class Event(object):
 
             if scintillate is True:
                 val = (0.1 + scint_amp[ii]) * val 
-
+            #print(data.shape, len(freq))
             data[ii] += val
+            print(max(val), max(data[ii]))
+            
 
         width_max = self.calc_width(self._dm, freq.max(),
                                     bw=bandwidth, NFREQ=NFREQ,
