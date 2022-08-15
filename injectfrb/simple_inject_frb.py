@@ -113,17 +113,43 @@ def inject_in_filterbank(fn_fil, fn_out_dir, N_FRB=1,
 
     timestr = time.strftime("%Y%m%d-%H%M")
     fn_fil_out = '%s/%s_nfrb%d_DM%d-%d_%ssec_%s.fil' % (fn_out_dir, simulator, N_FRB, dm_min, dm_max, ttot, timestr)
-    fn_params_out = fn_fil_out.strip('.fil') + '.txt'
+    #fn_params_out = fn_fil_out.strip('.fil') + '.txt'
+    fn_params_out = fn_fil_out.rsplit('.', 1)[0] + '.txt'
+
+    print(fn_fil_out)
+    print(fn_params_out)
 
     f_params_out = open(fn_params_out, 'w+')
 
-    f_params_out.write('# DM    Sigma   Time (s)   Sample   \
-                        Downfact   Width_int   With_obs   Spec_ind   \
-                        Scat_tau_ref  Tsamp (s)  BW_MHz  Freq_hi  Nchan  Freq_ref\n')
-    f_params_out.close()
-    fmt_out = '%8.3f  %5.2f  %8.4f %9d %5d  %1.6f    %5f    %5.2f    %1.4f   %1.4f  %8.2f  %8.2f   %d  %8.2f\n'
+    hdr_cols1 = ["DM", "Sigma", "Time", "Sample", 
+                 "dfact", "W_int", "W_obs", "Spec_idx", 
+                 "tau_ref", "Tsamp", "BW", 
+                 "f_hi", "Nchan", "f_ref"]
+    
+    hdr_cols2 = ["(pc/cc)", "", "(s)", "", 
+                 "", "(ms)", "(ms)", "", 
+                 "", "(us)", "(MHz)", 
+                 "(MHz)", "", "(MHz)"]
 
-        
+    hdr_fmts = ["{:^9}", "{:^8}", "{:^13}", "{:^9}", 
+                "{:^5}", "{:^8}", "{:^8}", "{:^8}", 
+                "{:^9}", "{:^8}", "{:^10}", 
+                "{:^10}", "{:^8}", "{:^10}"]
+    
+    dat_fmts = ["{:8.1f}", "{:8.2f}", "{:13.4f}", "{:9d}", 
+                "{:5d}", "{:8.3f}", "{:8.3f}", "{:8.2f}", 
+                "{:9.3f}", "{:8.2f}", "{:10.3f}", 
+                "{:10.3f}", "{:8d}", "{:10.3f}"]
+
+    fmt_hdr = "#" + "  ".join(hdr_fmts) + "\n"
+    hdr1 = fmt_hdr.format(*hdr_cols1)
+    hdr2 = fmt_hdr.format(*hdr_cols2)
+    f_params_out.write(hdr1)
+    f_params_out.write(hdr2)
+    f_params_out.close()
+
+    fmt_out = "  ".join(dat_fmts) + "\n"
+     
     print("============ HEADER INFORMATION ============")
     reader.print_filheader(header)
     kk = 0
@@ -260,11 +286,17 @@ def inject_in_filterbank(fn_fil, fn_out_dir, N_FRB=1,
         samplecounter += data.shape[1]
         f_params_out = open(fn_params_out, 'a+')
 
-        f_params_out.write(fmt_out % (params[0], snr_max, t0, t0_ind, downsamp, 
-                                      width_sec, width_obs, spec_ind, 
-                                      scat_tau_ref, dt, BW, header['fch1'], NFREQ, freq_ref))
+        outstr = fmt_out.format(params[0], snr_max, t0, t0_ind, downsamp,
+                                width_sec*1e3, width_obs*1e3, spec_ind,
+                                scat_tau_ref, dt*1e6, BW, header['fch1'], NFREQ, freq_ref)
+
+        print(fn_params_out)
+        print(outstr)
+
+        f_params_out.write(outstr)
 
         f_params_out.close()
+        
         del data, data_event
 
 
@@ -302,7 +334,7 @@ if __name__=='__main__':
     fn_fil_out = args[1]
 
     inject_in_filterbank(fn_fil, fn_fil_out, N_FRB=options.nfrb,
-                         NTIME=2**15, calc_snr=bool(options.calc_snr), start=0, 
+                         NTIME=2**15, calc_snr=False, start=0, 
                          paramslist=options.paramslist)
 
 
